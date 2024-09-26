@@ -7,15 +7,12 @@
 #include <stdio.h>
 
 #include "audio_app.h"
+#include "codec_setup.h"
 
 #ifndef XMOS_I2S_MASTER
 #define XMOS_I2S_MASTER         1
 #endif
-#define SAMPLE_FREQUENCY        96000
-#define MASTER_CLOCK_FREQUENCY  (12288000*4)
-#define DATA_BITS               24
-#define CHANS_PER_FRAME         2
-#define NUM_I2S_LINES           1
+
 
 // I2S resources
 on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
@@ -53,7 +50,7 @@ void i2s_loopback(server i2s_frame_callback_if i_i2s, streaming chanend audio_in
                 samples[i] = in_samps[i]; // copy samples
                 //audio_in <: samples[i];
             }
-            if (counter++ >= SAMPLE_FREQUENCY) {
+            if (counter++ >= 48000) {
                 printf(".\n");
                 counter = 0;
             }
