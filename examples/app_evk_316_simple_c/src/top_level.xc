@@ -11,8 +11,8 @@
 #ifndef XMOS_I2S_MASTER
 #define XMOS_I2S_MASTER         1
 #endif
-#define SAMPLE_FREQUENCY        48000
-#define MASTER_CLOCK_FREQUENCY  12288000
+#define SAMPLE_FREQUENCY        96000
+#define MASTER_CLOCK_FREQUENCY  (12288000*4)
 #define DATA_BITS               24
 #define CHANS_PER_FRAME         2
 #define NUM_I2S_LINES           1
