@@ -1,35 +1,75 @@
 #include "audio_app.h"
 
+#include <vector>
+#include <cmath>
+
 extern "C" {
     #include <xcore/channel_streaming.h>
-    #include <string.h>
     #include <stdio.h>
+    #include <xscope.h>
 }
+
+#include "audio_buffers.h"
 
 template<typename T>
 void clear_buffer(T *buffer, size_t length) {
     memset(buffer, 0, sizeof(T)*length);
 }
 
+template<typename T>
+void copy_buffer(T *src, T *dst, size_t length) {
+    memcpy(dst, src, sizeof(T)*length);
+}
 
-void audio_app_init(chanend_t i2s_audio_out) {
+void to_float_buf(audio_buffer_ptr_t src, std::vector< std::vector<sample_t> > dst) {
+
+    static const sample_t scaling = std::pow(2.f, -31);
+
+    for(unsigned int ch = 0; ch < kAudioChannels; ch++) {
+        auto buffer_ch = dst[ch];
+        for (unsigned int smp = 0; smp < kAudioSamples; smp++) {
+            buffer_ch[smp] = static_cast<sample_t>(src[ch][smp]) * scaling;
+        }
+    }
+}
+
+void from_float_buf(std::vector< std::vector<sample_t> > src, audio_buffer_ptr_t dst) {
+    static const sample_t scaling = std::pow(2.f, 31);
+
+    for(unsigned int ch = 0; ch < kAudioChannels; ch++) {
+        auto buffer_ch = src[ch];
+        for (unsigned int smp = 0; smp < kAudioSamples; smp++) {
+            src[ch][smp] = static_cast<int32_t>(buffer_ch[smp] * scaling);
+        }
+    }
 }
 
 
-void audio_loop(chanend_t i2s_audio_in, chanend_t i2s_audio_out)
+static std::vector< std::vector<sample_t> > sample_buffer;
+
+
+void audio_app_init() {
+    sample_buffer.resize(kAudioChannels);
+    for (unsigned int ch = 0; ch < kAudioChannels; ch++) {
+        sample_buffer[ch].resize(kAudioSamples, 0);
+    }
+}
+
+
+void audio_loop(chanend_t i2s_audio_in)
 {
-    int32_t __attribute__((aligned (8))) zerobuf [2*kAudioSamples][kAudioChannels];
-    clear_buffer(zerobuf, 2*kAudioBufferLength);
-    // Provide twice the data to i2s buffer
-    s_chan_out_buf_word(i2s_audio_out, (uint32_t*) zerobuf, 2*kAudioBufferLength);
-    printf("Audio app buffers initialised.\n");
-
-    int32_t __attribute__((aligned (8))) input [kAudioSamples][kAudioChannels];
-    clear_buffer(input, kAudioBufferLength);
-
     while (1) {
-        //s_chan_in_buf_word(i2s_audio_in, (uint32_t*) input, kAudioBufferLength);
-        // Process the data here!
-        //s_chan_out_buf_word(i2s_audio_out, (uint32_t*) input, kAudioBufferLength);
+        size_t audio_buf_idx = s_chan_in_word(i2s_audio_in);
+        audio_buffer_ptr_t audio_buf = audio_buffer_ptrs[audio_buf_idx];
+        to_float_buf(audio_buf, sample_buffer);
+
+        // Floating-point processing here
+        for(unsigned int ch = 0; ch < kAudioChannels; ch++) {
+        for (unsigned int smp = 0; smp < kAudioSamples; smp++) {
+            sample_buffer[ch][smp] = 0;//std::pow(sample_buffer[ch][smp], 5.f);
+        }
+    }
+
+        from_float_buf(sample_buffer, audio_buf);
     }
 }

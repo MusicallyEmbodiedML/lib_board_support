@@ -7,7 +7,7 @@ set(APP_HW_TARGET                   XCORE-AI-EXPLORER) # This is the XTC tools s
 set(APP_DEPENDENT_MODULES           "lib_board_support(1.0.0)"
                                     "lib_i2s")
 
-set(APP_COMPILER_FLAGS              -Os
+set(APP_COMPILER_FLAGS              -O0
                                     -g
                                     -report
                                     -DBOARD_SUPPORT_BOARD=XK_EVK_XU316
