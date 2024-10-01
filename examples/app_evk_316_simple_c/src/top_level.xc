@@ -31,7 +31,6 @@ extern void audio_app_init();
 
 void i2s_loopback(server i2s_frame_callback_if i_i2s, streaming chanend audio_in)
 {
-    uint32_t counter = 0;
     unsigned char sample_sent = 0;
     size_t audio_buf_cur_sample_i2s = 0;
 
@@ -56,12 +55,8 @@ void i2s_loopback(server i2s_frame_callback_if i_i2s, streaming chanend audio_in
                 audio_buf_cur_sample_i2s++;
                 if (audio_buf_cur_sample_i2s >= kAudioSamples) {
                     audio_buf_cur_sample_i2s = 0;
-                    audio_in <: audio_buf_cur_sample_i2s;
+                    audio_in <: audio_buffer_current_idx;
                     audio_buffer_current_idx = (audio_buffer_current_idx) ? 0 : 1;
-                }
-                if (counter++ >= 48000) {
-                    printf(".\n");
-                    counter = 0;
                 }
                 sample_sent = 0;
             }

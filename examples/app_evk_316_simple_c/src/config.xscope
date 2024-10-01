@@ -20,5 +20,10 @@
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="Audio Timing" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+    <!--
+    <Probe name="Audio Probe 1" type="CONTINUOUS" datatype="FLOAT" units="Value" enabled="true"/>
+    <Probe name="Audio Probe 2" type="CONTINUOUS" datatype="FLOAT" units="Value" enabled="true"/>
+    <Probe name="Audio Probe 3" type="CONTINUOUS" datatype="FLOAT" units="Value" enabled="true"/>
+    -->
     
 </xSCOPEconfig>
